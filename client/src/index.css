@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+    --color-surface: #0f172a;
+    --color-surface-elevated: #1e293b;
+    --color-border: #334155;
+    --color-teal: #14b8a6;
+    --color-teal-hover: #2dd4bf;
+}
+
+html {
+    background: #0f172a;
+}
+
+body {
+    min-height: 100vh;
+    background: #0f172a;
+    color: #f1f5f9;
+}

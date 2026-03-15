@@ -34,7 +34,6 @@ export const register = async (req, res) => {
     })
 }
 
-
 export const verifyEmail = async (req, res) => {
     const { token } = req.query;
 
@@ -89,6 +88,13 @@ export const login = async (req, res) => {
         })
     }
 
+    if (!user.verified) {
+        return res.status(400).json({
+            success: false,
+            message: "Email not verified",
+        })
+    }
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
     res.cookie("token", token, { httpOnly: true, secure: true, maxAge: 30 * 24 * 60 * 60 * 1000 });
 
@@ -100,8 +106,25 @@ export const login = async (req, res) => {
             username: user.username,
             email: user.email,
             verified: user.verified,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
         },
+    })
+}
+
+export const getMe = async (req, res) => {
+    const userId = req.user.userId;
+
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+        return res.status(400).json({
+            success: false,
+            message: "User not found",
+        })
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: "User found",
+        user
     })
 }

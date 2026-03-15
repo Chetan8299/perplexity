@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { login, register, verifyEmail } from "../controllers/auth.controllers.js";
+import { login, register, verifyEmail, getMe } from "../controllers/auth.controllers.js";
 import { loginValidations, registerValidations } from "../validators/auth.validators.js";
 import { validate } from "../middlewares/validate.js";
+import { authenticate } from "../middlewares/authenticate.js";
 
 const authRouter = Router();
 
@@ -31,5 +32,13 @@ authRouter.get("/verify-email", verifyEmail);
  * @body {string} password - The password of the user
  */
 authRouter.post("/login", loginValidations, validate, login);
+
+/**
+ * @route GET /api/auth/me
+ * @description Get the user's profile
+ * @access Private
+ * @returns {Object} The user's profile
+ */
+authRouter.get("/me", authenticate, getMe);
 
 export default authRouter;
