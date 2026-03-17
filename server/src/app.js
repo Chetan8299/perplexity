@@ -18,7 +18,10 @@ app.use(cors({
 
 // Routes
 import authRouter from "./routes/auth.routes.js";
+import chatRouter from "./routes/chat.routes.js";
+
 
 app.use("/api/auth", authRouter);
+app.use("/api/chats", chatRouter);
 
 export default app;

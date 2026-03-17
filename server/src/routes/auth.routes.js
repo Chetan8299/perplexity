@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, register, verifyEmail, getMe } from "../controllers/auth.controllers.js";
+import * as authControllers from "../controllers/auth.controllers.js";
 import { loginValidations, registerValidations } from "../validators/auth.validators.js";
 import { validate } from "../middlewares/validate.js";
 import { authenticate } from "../middlewares/authenticate.js";
@@ -14,7 +14,7 @@ const authRouter = Router();
  * @body {string} email - The email of the user
  * @body {string} password - The password of the user
  */
-authRouter.post("/register", registerValidations, validate, register);
+authRouter.post("/register", registerValidations, validate, authControllers.register);
 
 /**
  * @route GET /api/auth/verify-email
@@ -22,7 +22,7 @@ authRouter.post("/register", registerValidations, validate, register);
  * @access Public
  * @query {string} token - The token of the user
  */
-authRouter.get("/verify-email", verifyEmail);
+authRouter.get("/verify-email", authControllers.verifyEmail);
 
 /**
  * @route POST /api/auth/login
@@ -31,7 +31,7 @@ authRouter.get("/verify-email", verifyEmail);
  * @body {string} email - The email of the user
  * @body {string} password - The password of the user
  */
-authRouter.post("/login", loginValidations, validate, login);
+authRouter.post("/login", loginValidations, validate, authControllers.login);
 
 /**
  * @route GET /api/auth/me
@@ -39,6 +39,6 @@ authRouter.post("/login", loginValidations, validate, login);
  * @access Private
  * @returns {Object} The user's profile
  */
-authRouter.get("/me", authenticate, getMe);
+authRouter.get("/me", authenticate, authControllers.getMe);
 
 export default authRouter;
