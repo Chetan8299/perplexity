@@ -1,0 +1,26 @@
+import { Server } from "socket.io";
+
+let io = null;
+
+export function initSocket(httpServer) {
+    io = new Server(httpServer, {
+        cors: {
+            origin: process.env.FRONTEND_URL,
+            credentials: true
+        }
+    })
+
+    console.log("Socket.io server is RUNNING")
+
+    io.on("connection", (socket) => {
+        console.log("A user connected " + socket.id)
+    })
+}
+
+export function getIO() {
+    if(!io) {
+        throw new Error("Socket.io not initialized")
+    }
+
+    return io;
+}
