@@ -1,9 +1,11 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai"
-import { AIMessage, HumanMessage, SystemMessage } from "langchain"
+import { AIMessage, HumanMessage, SystemMessage, tool, createAgent } from "langchain"
+import { searchInternet } from "./internet.service.js";
+import * as z from "zod";
 
 const geminiModel = new ChatGoogleGenerativeAI({
-    model: "gemini-2.5-flash-lite",
+    model: "gemini-flash-latest",
     apiKey: process.env.GEMINI_API_KEY
 });
 
@@ -12,16 +14,37 @@ const mistralModel = new ChatMistralAI({
     apiKey: process.env.MISTRAL_API_KEY
 })
 
-export async function generateResponse(messages) {
-    const response = await geminiModel.invoke(messages.map(msg => {
-        if (msg.role == "user") {
-            return new HumanMessage(msg.content);
-        } else if (msg.role == "assistant") {
-            return new AIMessage(msg.content);
-        }
-    }))
+const searchInternetTool = tool(searchInternet, {
+    name: "searchInternet",
+    description: "Search the internet for latest information on a given topic",
+    schema: z.object({
+        query: z.string().describe("The search query to find information on the internet")
+    })
+})
 
-    return response.text;
+const agent = createAgent({
+    model: geminiModel,
+    tools: [searchInternetTool],
+})
+
+export async function generateResponse(messages) {
+    const response = await agent.invoke({
+        messages: [
+            new SystemMessage(`You are a helpful assistant that can search the internet for information on a given topic.
+                You have access to the following tools:
+                - searchInternet: Search the internet for latest information on a given topic
+                `),
+            ...messages.map(msg => {
+                if (msg?.role == "user") {
+                    return new HumanMessage(msg?.content);
+                } else if (msg?.role == "assistant") {
+                    return new AIMessage(msg?.content);
+                }
+            })
+        ]
+    })
+
+    return response.messages[response.messages.length - 1].text;
 }
 
 export async function generateChatTitle(message) {

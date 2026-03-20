@@ -3,8 +3,8 @@ import chatModel from "../models/chat.model.js"
 import messageModel from "../models/message.model.js"
 
 export const sendMessage = async (req, res) => {
-    const { message, chat: chatId } = req.body;
-
+    const { message, chatId } = req.body;
+   
     let title, chat;
     if (!chatId) {
         title = await generateChatTitle(message);
@@ -12,23 +12,22 @@ export const sendMessage = async (req, res) => {
             user: req.user.userId,
             title
         })
+        console.log("chat: ", chat);
     }
 
-    chatId = chatId || chat._id;
-
     await messageModel.create({
-        chatId: chatId,
+        chatId: chat?._id || chatId,
         content: message,
         role: "user"
     })
 
-    const messages = await messageModel.find({ chat: chatId }).sort({ createdAt: 1 });
+    const messages = await messageModel.find({ chatId: chat?._id || chatId }).sort({ createdAt: 1 });
 
     const result = await generateResponse(messages);
 
 
     const aiMessage = await messageModel.create({
-        chatId: chatId,
+        chatId: chat?._id || chatId,
         content: result,
         role: "assistant"
     })

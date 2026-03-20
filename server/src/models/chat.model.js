@@ -7,11 +7,11 @@ const chatSchema = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: "User",
+        ref: "user",
         required: true,
     },
 }, { timestamps: true });
 
-const chatModel = model("Chat", chatSchema);
+const chatModel = model("chat", chatSchema);
 
 export default chatModel;

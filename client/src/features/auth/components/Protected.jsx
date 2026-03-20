@@ -23,16 +23,17 @@ const Protected = ({ children }) => {
     );
   }
 
+  if (!user && !authLoading) {
+    console.log("User not found");
+    return <Navigate to="/login" />;
+  }
+
   if (authError) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4">
         {authError}
       </div>
     );
-  }
-
-  if (!user && !authLoading && !authError) {
-    return <Navigate to="/login" />;
   }
 
   return children;
